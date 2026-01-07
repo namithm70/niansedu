@@ -208,7 +208,7 @@ class _SocialFeedScreenState extends State<SocialFeedScreen> {
                   ListTile(
                     leading: CircleAvatar(
                         backgroundImage: AssetImage('assets/app_logo.jpeg')),
-                    title: Text("edxera"),
+                    title: Text("Nian's Edu Campus"),
                     subtitle: Text("1 hour ago"),
                     trailing: IconButton(
                       icon: Icon(Icons.more_vert),

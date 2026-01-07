@@ -138,148 +138,185 @@ class _TrendingCourceState extends State<TrendingCource> {
   Widget trending_cource_list() {
     return Expanded(
       flex: 1,
-      child: GridView.count(
+      child: ListView.separated(
         physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        crossAxisCount: 2,
-        crossAxisSpacing: 18.73,
-        mainAxisSpacing: 20,
-        childAspectRatio: 0.650,
-        children: (homecontroller.trendingCoursesDataModel.data?.courses ?? [])
-            .map((index) => GestureDetector(
-                  onTap: () {
-                    Get.to(MyCources(), arguments: index.id ?? 0);
-                  },
-                  child: Container(
-                    //height: 302,
-                    width: 177.w,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(color: const Color(0XFF503494).withOpacity(0.14), offset: const Offset(-4, 5), blurRadius: 16),
-                        ],
-                        color: const Color(0XFFFFFFFF)),
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 170.h,
-                          width: 190.w,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(color: const Color(0XFF503494).withOpacity(0.14), offset: const Offset(-4, 5), blurRadius: 16),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: CachedNetworkImage(
-                              fit: BoxFit.fill,
-                              // height: 50.h,
-                              // width: 50.w,
-                              imageUrl: '${ApiConstants.publicBaseUrl}/${index.courseThumbnail ?? ''}',
-                              progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-                                child: Container(
-                                  height: 30.h,
-                                  width: 30.w,
-                                  child: CircularProgressIndicator(value: downloadProgress.progress),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => ClipRRect(
-                                borderRadius: BorderRadius.circular(10.h),
-                                child: Container(
-                                  // height: 50.h,
-                                  // width: 50.w,
-                                  color: Colors.grey.withOpacity(0.2),
-                                ),
-                              ),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        itemCount: (homecontroller.trendingCoursesDataModel.data?.courses ?? []).length,
+        separatorBuilder: (context, _) => SizedBox(height: 16.h),
+        itemBuilder: (context, i) {
+          final course = homecontroller.trendingCoursesDataModel.data!.courses![i];
+          return GestureDetector(
+            onTap: () {
+              Get.to(MyCources(), arguments: course.id ?? 0);
+            },
+            child: Container(
+              height: 120.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0XFF503494).withOpacity(0.14),
+                    offset: const Offset(-4, 5),
+                    blurRadius: 16,
+                  ),
+                ],
+                color: const Color(0XFFFFFFFF),
+              ),
+              child: Row(
+                children: [
+                  // Thumbnail
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CachedNetworkImage(
+                      width: 140.w,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                      imageUrl: ApiConstants.resolvePublicUrl(course.courseThumbnail),
+                      progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                        child: SizedBox(
+                          height: 24.h,
+                          width: 24.w,
+                          child: CircularProgressIndicator(value: downloadProgress.progress),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 140.w,
+                        height: double.infinity,
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+
+                  // Content
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 6.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            course.title ?? '',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              height: 1.15,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Gilroy',
+                              color: const Color(0XFF000000),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 6.w, right: 6.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          SizedBox(height: 8.h),
+                          Row(
                             children: [
-                              SizedBox(height: 6.h),
-                              Text(
-                                index.title!,
-                                maxLines: 2,
-                                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700, fontFamily: 'Gilroy', color: const Color(0XFF000000)),
-                              ),
-                              // Text(
-                              //   index.title!,
-                              //   style: TextStyle(
-                              //       fontSize: 14.sp,
-                              //       fontWeight: FontWeight.w700,
-                              //       fontFamily: 'Gilroy',
-                              //       color: const Color(0XFF000000)),
-                              // ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 12.h),
+                              Container(
+                                height: 28.h,
+                                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: const Color(0XFFFAF4E1),
+                                ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Container(
-                                      height: 27.h,
-                                      width: 50.w,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: const Color(0XFFFAF4E1),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Image(
-                                            image: const AssetImage("assets/staricon.png"),
-                                            height: 15.h,
-                                            width: 15.w,
-                                          ),
-                                          Text(
-                                            "${index.totalRating ?? ""}",
-                                            style: TextStyle(color: Color(0XFFFFC403), fontFamily: 'Gilroy', fontSize: 14.sp),
-                                          ),
-                                        ],
+                                    Image(
+                                      image: const AssetImage("assets/staricon.png"),
+                                      height: 15.h,
+                                      width: 15.w,
+                                    ),
+                                    SizedBox(width: 6.w),
+                                    Text(
+                                      "${course.totalRating ?? 0}",
+                                      style: TextStyle(
+                                        color: const Color(0XFFFFC403),
+                                        fontFamily: 'Gilroy',
+                                        fontSize: 14.sp,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(right: 6.w),
-                                      child: SizedBox(
-                                        height: 21.h,
-                                        width: 76.w,
-                                        child: Row(
-                                          children: [
-                                            // Image(
-                                            //   image: const AssetImage(
-                                            //       "assets/clock.png"),
-                                            //   height: 17.h,
-                                            //   width: 17.w,
-                                            // ),
-                                            // SizedBox(width: 4.w),
-                                            // Text(
-                                            //   '2.40Hrs',
-                                            //   style: TextStyle(
-                                            //       fontSize: 13.sp,
-                                            //       color:
-                                            //           const Color(0XFF000000),
-                                            //       fontWeight: FontWeight.w400,
-                                            //       fontFamily: 'Gilroy'),
-                                            // )
-                                          ],
-                                        ),
-                                      ),
-                                    )
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 10.h),
+                              const Spacer(),
+                              _priceChipForTrendingCourse(course),
                             ],
                           ),
-                        )
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ))
-            .toList(),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _priceChipForTrendingCourse(dynamic course) {
+    final bool isFree = (course?.isFree ?? 0) == 1;
+    final int? price = course?.price is int ? course.price as int : int.tryParse('${course?.price ?? ''}');
+    final int? discounted = _discountedPriceForTrendingCourse(course);
+
+    if (isFree) {
+      return _priceChip(text: 'FREE');
+    }
+
+    final int? show = discounted ?? price;
+    if (show == null) return const SizedBox.shrink();
+    return _priceChip(text: '₹$show');
+  }
+
+  int? _discountedPriceForTrendingCourse(dynamic course) {
+    try {
+      final int? price = course?.price is int ? course.price as int : int.tryParse('${course?.price ?? ''}');
+      if (price == null) return null;
+      if ((course?.isDiscountable ?? 0) != 1) return null;
+
+      final DateTime? start = course?.discountStartAt is DateTime ? course.discountStartAt as DateTime : null;
+      final DateTime? end = course?.discountEndAt is DateTime ? course.discountEndAt as DateTime : null;
+      final now = DateTime.now();
+      if (start != null && now.isBefore(start)) return null;
+      if (end != null && now.isAfter(end)) return null;
+
+      final int? discount = course?.discount is int ? course.discount as int : int.tryParse('${course?.discount ?? ''}');
+      if (discount == null || discount <= 0) return null;
+
+      final String type = (course?.discountType ?? '').toString().toLowerCase();
+      int discounted;
+      if (type.contains('percent')) {
+        discounted = ((price * (100 - discount)) / 100).round();
+      } else {
+        discounted = price - discount;
+      }
+      if (discounted < 0) discounted = 0;
+      if (discounted >= price) return null;
+      return discounted;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Widget _priceChip({required String text}) {
+    return Container(
+      height: 30.h,
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: const Color(0XFFE5ECFF),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: const Color(0XFF503494),
+          fontFamily: 'Gilroy',
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "edxera learning app",
+      title: "Nian's Edu Campus",
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
       ),

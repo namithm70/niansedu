@@ -6,7 +6,6 @@ import 'package:edxera/utils/shared_pref.dart';
 import 'package:logger/logger.dart';
 import 'package:get/get.dart' as g;
 
-import '../../controller/controller.dart';
 import '../../login/login_empty_state.dart';
 import 'api_constants.dart';
 
@@ -15,7 +14,15 @@ class API {
   CancelToken cancelToken = CancelToken();
 
   API() {
-    _dio.options.baseUrl = "https://xianinfotech.in/edxera/api/";
+    // Production API base URL
+    _dio.options.baseUrl = ApiConstants.apiBaseUrl;
+    _dio.options.headers[ApiConstants.organizationIdHeader] =
+        ApiConstants.organizationId;
+    _dio.options.headers[ApiConstants.apiKeyHeader] = ApiConstants.apiKey;
+    // Prevent infinite loaders on bad networks/server hangs
+    _dio.options.connectTimeout = const Duration(seconds: 15);
+    _dio.options.receiveTimeout = const Duration(seconds: 20);
+    _dio.options.sendTimeout = const Duration(seconds: 15);
     _dio.interceptors.add(CustomInterceptor(cancelToken: cancelToken));
   }
 
@@ -41,6 +48,9 @@ class CustomInterceptor extends Interceptor {
     DioException myErr = err.copyWith(message: myErrorMsg, response: err.response);
 
     logger.e(myErr);
+    logger.e("Request URL: ${err.requestOptions.uri}");
+    logger.e("Request headers: ${err.requestOptions.headers}");
+    logger.e("Response data: ${err.response?.data}");
 
     if (myErr.response != null) {
       logger.e("API_Error => ${myErr.response?.statusCode}  ${myErr.requestOptions.uri.toString()}", error: myErr);
@@ -55,6 +65,8 @@ class CustomInterceptor extends Interceptor {
     final path = options.path;
     // Automatically assign cancelToken to each request
     options.cancelToken = cancelToken;
+    logger.i("Request URL: ${options.uri}");
+    logger.i("Request headers: ${options.headers}");
 
     if (options.data is FormData) {
       final data = options.data as FormData;

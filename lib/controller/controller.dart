@@ -1,11 +1,10 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:edxera/My_cources/Models/course_data_model.dart';
-import 'package:edxera/My_cources/lesson_play.dart';
 import 'package:edxera/batchs/BatchDetailsScreen/Modules/exam_description_screen.dart';
 import 'package:edxera/batchs/BatchDetailsScreen/Modules/exam_mcq_screen.dart';
 import 'package:edxera/batchs/BatchDetailsScreen/Modules/study_plan_assigment_screen.dart';
-import 'package:edxera/batchs/BatchDetailsScreen/Modules/youtube_video_player.dart';
-import 'package:edxera/batchs/BatchDetailsScreen/SubModules/pdf_viewers.dart';
 import 'package:edxera/batchs/Models/assigment_Result_Data_model.dart';
 import 'package:edxera/batchs/Models/exam_mcq_data_model.dart';
 import 'package:edxera/batchs/Models/exam_result_check_data_model.dart';
@@ -13,7 +12,6 @@ import 'package:edxera/batchs/Models/study_plan_assigment_data_model.dart';
 import 'package:edxera/batchs/Models/study_plan_details_data_model.dart';
 import 'package:edxera/batchs/Models/user_logout_or_not_data_model.dart';
 import 'package:edxera/chate/detail_chate.dart';
-import 'package:edxera/cources/Models/cources_details_data_model.dart';
 import 'package:edxera/cources/Models/course_chapter_list_data_model.dart';
 import 'package:edxera/cources/cources.dart';
 import 'package:edxera/home/Models/categories_detail_model.dart';
@@ -34,7 +32,6 @@ import 'package:edxera/profile/Models/contact_us_data_model.dart';
 import 'package:edxera/profile/Models/faqs_list_data_model.dart';
 import 'package:edxera/profile/Models/get_certificat_data_model.dart';
 import 'package:edxera/profile/Models/logout_data_model.dart';
-import 'package:edxera/profile/Models/privacy_policy_pages_data_model.dart';
 import 'package:edxera/profile/Models/privacypolicy_entity.dart';
 import 'package:edxera/profile/Models/user_data_model.dart';
 import 'package:edxera/repositories/post_repository.dart';
@@ -42,7 +39,6 @@ import 'package:edxera/utils/shared_pref.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
@@ -194,7 +190,20 @@ class HomeController extends GetxController {
     try {
       final resp = await postRepository.homeCategoriesGet();
       if (resp != null) {
-        categoriesData.value = CategoriesModel.fromMap(resp.data);
+        // postRepository.homeCategoriesGet() may return Map (decoded) or String (raw JSON/HTML).
+        final dynamic decoded = (resp is String)
+            ? (() {
+                try {
+                  return jsonDecode(resp);
+                } catch (_) {
+                  return null;
+                }
+              })()
+            : resp;
+
+        if (decoded is Map<String, dynamic>) {
+          categoriesData.value = CategoriesModel.fromMap(decoded);
+        }
       }
     } on DioException catch (ex) {
       Get.showSnackbar(
@@ -217,7 +226,19 @@ class HomeController extends GetxController {
     try {
       final resp = await postRepository.categoriesDetailGet(id: id);
       if (resp != null) {
-        categoriesDetailsData.value = CategoriesDetailModel.fromMap(resp.data);
+        final dynamic decoded = (resp is String)
+            ? (() {
+                try {
+                  return jsonDecode(resp);
+                } catch (_) {
+                  return null;
+                }
+              })()
+            : resp;
+
+        if (decoded is Map<String, dynamic>) {
+          categoriesDetailsData.value = CategoriesDetailModel.fromMap(decoded);
+        }
       }
     } on DioException catch (ex) {
       Get.showSnackbar(
@@ -1101,7 +1122,6 @@ class HomeMainController extends GetxController {
   RxBool isloader = false.obs;
   RxInt position = 0.obs;
   PostRepository postRepository = PostRepository();
-  final Rx<UserLogourOrNotDataModel> _userValidOrNotDeviceToken = UserLogourOrNotDataModel().obs;
 
   void feedbackApi() async {
     isloader(true);
@@ -1272,7 +1292,7 @@ class CourceController extends GetxController with GetTickerProviderStateMixin {
     try {
       final resp = await postRepository.bypassPaymentApi();
       return resp;
-    } catch (e, s) {
+    } catch (e) {
       return false;
     }
   }
@@ -1280,11 +1300,6 @@ class CourceController extends GetxController with GetTickerProviderStateMixin {
   Future<void> courseDetailsDataGets() async {
     isloader(true);
     isVideoLoading(true);
-    var data = {
-      'user_id': PrefData.getUserId().toString(),
-      'course_id': courseId.toString(),
-    };
-    //print(data);
     try {
       CourseDataEntity? classesData = await postRepository.courseDetailsDataGet(courseId.toString());
       if ((classesData?.success ?? false)) {
@@ -1295,29 +1310,45 @@ class CourceController extends GetxController with GetTickerProviderStateMixin {
             isVideoLoaded.value = false;
           } else {
             if (_courseDetailsDataModel.value.data?.course?.video is String) {
-              flickManager = FlickManager(
-                videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(
-                  (_courseDetailsDataModel.value.data?.course?.video as String).isURL
-                      ? _courseDetailsDataModel.value.data?.course?.video
-                      : '${ApiConstants.publicBaseUrl}/${_courseDetailsDataModel.value.data?.course?.video ?? ''}',
-                )),
-                autoPlay: false,
-              );
-              isVideoLoaded.value = true;
-              print('${ApiConstants.publicBaseUrl}/${_courseDetailsDataModel.value.data?.course?.video ?? ''}');
+              final raw = (_courseDetailsDataModel.value.data?.course?.video as String?)?.trim() ?? '';
+              // video_player cannot play YouTube URLs; fall back to banner image in that case.
+              final isYoutube = raw.contains('youtube.com') || raw.contains('youtu.be');
+              if (raw.isEmpty || isYoutube) {
+                isVideoLoaded.value = false;
+              } else {
+                final url = raw.isURL ? raw : ApiConstants.resolvePublicUrl(raw);
+                try {
+                  flickManager = FlickManager(
+                    videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(url)),
+                    autoPlay: false,
+                  );
+                  isVideoLoaded.value = true;
+                } catch (_) {
+                  isVideoLoaded.value = false;
+                }
+              }
             } else {
               Map<String, dynamic> videoData = _courseDetailsDataModel.value.data?.course?.video;
-              if (videoData.containsKey('image')) {
-                flickManager = FlickManager(
-                  videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(
-                    '${ApiConstants.publicBaseUrl}/${_courseDetailsDataModel.value.data?.course?.video['image'] ?? ''}',
-                  )),
-                  autoPlay: false,
-                );
-                isVideoLoaded.value = true;
-                print('${ApiConstants.publicBaseUrl}/${_courseDetailsDataModel.value.data?.course?.video['image'] ?? ''}');
-              } else {
+              final dynamic v = videoData['video'] ?? videoData['file'] ?? videoData['url'] ?? videoData['image'];
+              final raw = v?.toString().trim() ?? '';
+              if (raw.isEmpty) {
                 isVideoLoaded.value = false;
+              } else {
+                final isYoutube = raw.contains('youtube.com') || raw.contains('youtu.be');
+                if (isYoutube) {
+                  isVideoLoaded.value = false;
+                } else {
+                  final url = raw.startsWith('http') ? raw : ApiConstants.resolvePublicUrl(raw);
+                  try {
+                    flickManager = FlickManager(
+                      videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(url)),
+                      autoPlay: false,
+                    );
+                    isVideoLoaded.value = true;
+                  } catch (_) {
+                    isVideoLoaded.value = false;
+                  }
+                }
               }
             }
           }
@@ -1326,7 +1357,7 @@ class CourceController extends GetxController with GetTickerProviderStateMixin {
           Get.showSnackbar(
             GetSnackBar(
               backgroundColor: Colors.green,
-              message: classesData?.message,
+              message: classesData.message,
               duration: const Duration(seconds: 1),
             ),
           );
@@ -1359,7 +1390,7 @@ class CourceController extends GetxController with GetTickerProviderStateMixin {
       'course_id': courseId.toString(),
     };
     print(data);
-    CourseDetailsDataModel? classesData = await postRepository.coursePurchaseDetails(data);
+    await postRepository.coursePurchaseDetails(data);
 
     isloader(false);
   }

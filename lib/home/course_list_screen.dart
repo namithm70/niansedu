@@ -139,7 +139,9 @@ class _CourseListScreenState extends State<CourseListScreen> {
                                               fit: BoxFit.fill,
                                               // height: 50.h,
                                               // width: 50.w,
-                                              imageUrl: '${ApiConstants.publicBaseUrl}/${course?[index].courseThumbnail ?? ''}',
+                                              imageUrl: ApiConstants.resolvePublicUrl(
+                                                course?[index].courseThumbnail,
+                                              ),
                                               progressIndicatorBuilder: (context, url, downloadProgress) => Center(
                                                 child: Container(
                                                   height: 30.h,

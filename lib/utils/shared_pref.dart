@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefData {
-  static String prefName = "com.edxera.wandoor";
+  static String prefName = "com.nians.educampus.app";
 
   static String isIntro = prefName + "isIntro";
   static String isLogin = prefName + "isLigin";

@@ -16,10 +16,7 @@ import 'package:edxera/batchs/controllers/lesson_details_controller.dart';
 import 'package:edxera/home/all_categories_screen.dart';
 import 'package:edxera/home/categorey_wise_subject_screen.dart';
 import 'package:edxera/home/free_study_matrial_view_screen.dart';
-import 'package:edxera/home/notification_screen.dart';
 import 'package:edxera/home/sub_categories_screen.dart';
-import 'package:edxera/home/testimonials_widget.dart';
-import 'package:edxera/profile/edit_screen.dart';
 import 'package:edxera/utils/shared_pref.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,16 +25,13 @@ import 'package:get/get.dart';
 import 'package:edxera/controller/controller.dart';
 import 'package:edxera/cources/cources.dart';
 import 'package:edxera/home/recent_added_cource_detail.dart';
-import 'package:edxera/home/trending_cource.dart';
 import 'package:edxera/models/recently_added.dart';
 import 'package:edxera/models/trending_cource.dart';
 import 'package:edxera/utils/slider_page_data_model.dart';
 import '../languagecontrols/LanguageCheck.dart';
-import '../login/login_empty_state.dart';
 import '../repositories/api/api_constants.dart';
-import '../repositories/post_repository.dart';
 import '../utils/screen_size.dart';
-import 'package:badges/badges.dart' as badges;
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -319,25 +313,51 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         FontWeight
                                                                             .w400)),
                                                           ),
-                                                          child: DropdownSearch<
-                                                              String>(
-                                                            popupProps:
-                                                                PopupProps.menu(
-                                                              showSearchBox:
-                                                                  true,
-                                                              showSelectedItems:
-                                                                  true,
-                                                              disabledItemFn:
-                                                                  (String s) =>
-                                                                      s.startsWith(
-                                                                          'I'),
-                                                            ),
-                                                            items:
-                                                                homecontroller
-                                                                    .countries,
-                                                            dropdownDecoratorProps:
-                                                                DropDownDecoratorProps(
-                                                              baseStyle: TextStyle(
+                                                          child: Obx(() {
+                                                            return DropdownSearch<
+                                                                String>(
+                                                              // items:
+                                                              //     homecontroller
+                                                              //         .countries,
+                                                              selectedItem:
+                                                                  homecontroller
+                                                                      .dropdownvalue
+                                                                      .value,
+                                                              popupProps:
+                                                                  PopupProps
+                                                                      .menu(
+                                                                showSearchBox:
+                                                                    true,
+                                                                showSelectedItems:
+                                                                    true,
+                                                                disabledItemFn:
+                                                                    (String s) =>
+                                                                        s.startsWith(
+                                                                            'I'),
+                                                                searchFieldProps:
+                                                                    TextFieldProps(
+                                                                  decoration:
+                                                                      InputDecoration(
+                                                                    hintText:
+                                                                        "Search country",
+                                                                    border:
+                                                                        OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10),
+                                                                    ),
+                                                                    contentPadding: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            12,
+                                                                        vertical:
+                                                                            8),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              decoratorProps:
+                                                                  DropDownDecoratorProps(
+                                                                baseStyle:
+                                                                    TextStyle(
                                                                   color: Colors
                                                                       .black,
                                                                   fontSize:
@@ -346,10 +366,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                       'Gilroy',
                                                                   fontWeight:
                                                                       FontWeight
-                                                                          .w400),
-                                                              dropdownSearchDecoration:
-                                                                  InputDecoration(
-                                                                labelStyle: TextStyle(
+                                                                          .w400,
+                                                                ),
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  labelText:
+                                                                      "Select Country",
+                                                                  labelStyle:
+                                                                      TextStyle(
                                                                     color: Color(
                                                                         0XFF9B9B9B),
                                                                     fontSize:
@@ -358,92 +382,74 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         'Gilroy',
                                                                     fontWeight:
                                                                         FontWeight
-                                                                            .w400),
-                                                                enabledBorder:
-                                                                    UnderlineInputBorder(
-                                                                  borderSide:
-                                                                      BorderSide(
-                                                                          color:
-                                                                              Colors.black),
-                                                                ),
-                                                                focusedBorder:
-                                                                    UnderlineInputBorder(
-                                                                  borderSide:
-                                                                      BorderSide(
-                                                                          color:
-                                                                              Colors.black),
+                                                                            .w400,
+                                                                  ),
+                                                                  enabledBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                            color:
+                                                                                Colors.black),
+                                                                  ),
+                                                                  focusedBorder:
+                                                                      UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                            color:
+                                                                                Colors.black),
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                            onChanged: (value) {
-                                                              homecontroller
-                                                                      .dropdownvalue
-                                                                      .value =
-                                                                  value ?? '';
-                                                              for (var element
-                                                                  in homecontroller
-                                                                          .studyPlanCourseNameDataModel
-                                                                          .data
-                                                                          ?.userCourses ??
-                                                                      []) {
-                                                                if (element
-                                                                        .courseTitle ==
-                                                                    value) {
+                                                              onChanged:
+                                                                  (value) async {
+                                                                if (value ==
+                                                                    null)
+                                                                  return;
+
+                                                                homecontroller
+                                                                    .dropdownvalue
+                                                                    .value = value;
+
+                                                                final selectedCourse =
+                                                                    homecontroller
+                                                                        .studyPlanCourseNameDataModel
+                                                                        .data
+                                                                        ?.userCourses
+                                                                        ?.firstWhere(
+                                                                  (element) =>
+                                                                      element
+                                                                          .courseTitle ==
+                                                                      value,
+                                                                  // orElse: () {
+                                                                  
+                                                                  // },
+                                                                );
+
+                                                                if (selectedCourse !=
+                                                                    null) {
                                                                   homecontroller
                                                                           .batchid
                                                                           .value =
-                                                                      element
+                                                                      selectedCourse
                                                                           .batchId
                                                                           .toString();
-                                                                  print(element
-                                                                      .batchId);
-                                                                  PrefData.setCourseID(
-                                                                      element
+
+                                                                  await PrefData.setCourseID(
+                                                                      selectedCourse
                                                                           .batchId
                                                                           .toString());
-                                                                  PrefData.setCourseName(
-                                                                      value ??
-                                                                          '');
-                                                                  homecontroller
-                                                                      .getTodayStudyPlan(element
+                                                                  await PrefData
+                                                                      .setCourseName(
+                                                                          value);
+
+                                                                  await homecontroller.getTodayStudyPlan(
+                                                                      selectedCourse
                                                                           .batchId
-                                                                          .toString())
-                                                                      .then(
-                                                                          (value) {
-                                                                    // Future.delayed(
-                                                                    //     Duration(
-                                                                    //         seconds:
-                                                                    //            1),
-                                                                    //     () {
-                                                                    setState(
-                                                                        () {});
-                                                                    // });
-                                                                  });
+                                                                          .toString());
                                                                 }
-                                                              }
-                                                            },
-                                                            onSaved:
-                                                                (newValue) {
-                                                              // for (var element
-                                                              //     in homecontroller
-                                                              //             .studyPlanCourseNameDataModel
-                                                              //             .data
-                                                              //             ?.userCourses ??
-                                                              //         []) {
-                                                              //   if (element
-                                                              //           .courseTitle ==
-                                                              //       newValue) {
-                                                              //     print(element
-                                                              //         .batchId);
-                                                              //   }
-                                                              // }
-                                                            },
-                                                            selectedItem:
-                                                                homecontroller
-                                                                    .dropdownvalue
-                                                                    .value,
-                                                          ),
-                                                        )
+                                                              },
+                                                            );
+                                                          }))
                                                       : Container(),
                                                 ),
                                               ],
@@ -888,7 +894,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     MaterialPageRoute(
                                                                       builder: (context) =>
                                                                           VidioPlay(
-                                                                              lessonplay: '${ApiConstants.publicBaseUrl}/${dataVIdeo["video"]}'),
+                                                                            lessonplay: ApiConstants.resolvePublicUrl(
+                                                                              dataVIdeo["video"]?.toString(),
+                                                                            ),
+                                                                          ),
                                                                     ),
                                                                   );
                                                                 } else {
@@ -971,7 +980,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20.sp, color: Colors.black),
                                                                                 ),
                                                                               ),
-                                                                            )
+                                                                             )
                                                                           ],
                                                                         ),
                                                                       ),
@@ -1519,9 +1528,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 fit: BoxFit.fill,
                 height: 200.h,
                 // width: 49.93.w,
-                imageUrl: homecontroller.homeDashboardDataModel.data?[0]
-                        .sliders?[index].image ??
-                    '',
+                    imageUrl: ApiConstants.resolvePublicUrl(
+                      homecontroller.homeDashboardDataModel.data?[0].sliders?[index].image,
+                    ),
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     Center(
                   child: Container(
@@ -1650,7 +1659,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 50.h,
                             width: 50.w,
                             imageUrl:
-                                '${ApiConstants.publicBaseUrl}/${item?.categories?[index].image?.originalImage ?? ''}',
+                                ApiConstants.resolvePublicUrl(item?.categories?[index].image?.originalImage),
                             progressIndicatorBuilder:
                                 (context, url, downloadProgress) => Center(
                               child: Container(
@@ -1727,8 +1736,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           fit: BoxFit.fill,
                           // height: 50.h,
                           // width: 50.w,
-                          imageUrl:
-                              '${ApiConstants.publicBaseUrl}/${homecontroller.trendingCoursesDataModel.data?.courses?[index].courseThumbnail ?? ''}',
+                          imageUrl: ApiConstants.resolvePublicUrl(
+                              homecontroller.trendingCoursesDataModel.data?.courses?[index].courseThumbnail),
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) => Center(
                             child: Container(
@@ -1796,6 +1805,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: 5.h),
+                    _priceChipForTrendingCourse(
+                      homecontroller.trendingCoursesDataModel.data?.courses?[index],
+                    ),
                     // Text(trendingCource[index].subtitle!,
                     //     style: TextStyle(
                     //         fontFamily: 'Gilroy',
@@ -1863,8 +1875,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               fit: BoxFit.fill,
                               // height: 50.h,
                               // width: 50.w,
-                              imageUrl:
-                                  '${ApiConstants.publicBaseUrl}/${course?[index].courseThumbnail ?? ''}',
+                              imageUrl: ApiConstants.resolvePublicUrl(course?[index].courseThumbnail),
                               progressIndicatorBuilder:
                                   (context, url, downloadProgress) => Center(
                                 child: Container(
@@ -1930,6 +1941,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         SizedBox(height: 5.h),
+                        _priceChipForTrendingCourse(course?[index]),
                         // Text(trendingCource[index].subtitle!,
                         //     style: TextStyle(
                         //         fontFamily: 'Gilroy',
@@ -1982,8 +1994,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fit: BoxFit.fill,
                           // height: 50.h,
                           // width: 50.w,
-                          imageUrl:
-                              '${ApiConstants.publicBaseUrl}/${course?[index].courseThumbnail ?? ''}',
+                          imageUrl: ApiConstants.resolvePublicUrl(course?[index].courseThumbnail),
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) => Center(
                             child: Container(
@@ -2302,6 +2313,82 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           }),
+    );
+  }
+
+  Widget _priceChipForTrendingCourse(dynamic course) {
+    final bool isFree = (course?.isFree ?? 0) == 1;
+    final int? price =
+        course?.price is int ? course.price as int : int.tryParse('${course?.price ?? ''}');
+    final int? discounted = _discountedPriceForTrendingCourse(course);
+
+    if (isFree) {
+      return _priceChip(text: 'FREE');
+    }
+
+    final int? show = discounted ?? price;
+    if (show == null) return const SizedBox.shrink();
+    return _priceChip(text: '₹$show');
+  }
+
+  int? _discountedPriceForTrendingCourse(dynamic course) {
+    try {
+      final int? price =
+          course?.price is int ? course.price as int : int.tryParse('${course?.price ?? ''}');
+      if (price == null) return null;
+      if ((course?.isDiscountable ?? 0) != 1) return null;
+
+      final DateTime? start =
+          course?.discountStartAt is DateTime ? course.discountStartAt as DateTime : null;
+      final DateTime? end =
+          course?.discountEndAt is DateTime ? course.discountEndAt as DateTime : null;
+      final now = DateTime.now();
+      if (start != null && now.isBefore(start)) return null;
+      if (end != null && now.isAfter(end)) return null;
+
+      final int? discount =
+          course?.discount is int ? course.discount as int : int.tryParse('${course?.discount ?? ''}');
+      if (discount == null || discount <= 0) return null;
+
+      final String type = (course?.discountType ?? '').toString().toLowerCase();
+      int discounted;
+      if (type.contains('percent')) {
+        discounted = ((price * (100 - discount)) / 100).round();
+      } else {
+        discounted = price - discount;
+      }
+      if (discounted < 0) discounted = 0;
+      if (discounted >= price) return null;
+      return discounted;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Widget _priceChip({required String text}) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Container(
+        height: 28.h,
+        padding: EdgeInsets.symmetric(horizontal: 10.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: const Color(0XFFE5ECFF),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: const Color(0XFF503494),
+              fontFamily: 'Gilroy',
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

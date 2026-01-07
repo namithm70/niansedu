@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:edxera/batchs/batches_show_by_course.dart';
 import 'package:edxera/repositories/api/api_constants.dart';
 import 'package:flick_video_player/flick_video_player.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:edxera/controller/controller.dart';
@@ -14,7 +14,6 @@ import 'package:edxera/cources/overview_page.dart';
 import 'package:edxera/cources/review_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../batchs/controllers/batch_main_controller.dart';
 import '../languagecontrols/LanguageCheck.dart';
 import '../utils/screen_size.dart';
 import '../utils/shared_pref.dart';
@@ -147,10 +146,22 @@ class _MyCourcesState extends State<MyCources> {
                                                 borderRadius: BorderRadius.circular(22),
                                                 child: CourceController.imageGroup == null
                                                     ? Center(child: Text("Video is temporarily unavailable"))
-                                                    : Image.network(
-                                                        "${ApiConstants.publicBaseUrl}/${CourceController.courseDetailsDataModel.data?.course?.image?.originalImage}",
-                                                        errorBuilder: (context, error, stackTrace) =>
-                                                            Center(child: Text("Video is temporarily unavailable")),
+                                                    : CachedNetworkImage(
+                                                        fit: BoxFit.cover,
+                                                        imageUrl: ApiConstants.resolvePublicUrl(
+                                                          CourceController.courseDetailsDataModel.data?.course?.image?.originalImage ??
+                                                              CourceController.courseDetailsDataModel.data?.course?.courseThumbnail,
+                                                        ),
+                                                        progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                                                          child: SizedBox(
+                                                            height: 24.h,
+                                                            width: 24.w,
+                                                            child: CircularProgressIndicator(value: downloadProgress.progress),
+                                                          ),
+                                                        ),
+                                                        errorWidget: (context, url, error) => const Center(
+                                                          child: Text("Video is temporarily unavailable"),
+                                                        ),
                                                       ),
                                               ),
                                             ),
@@ -242,7 +253,7 @@ class _MyCourcesState extends State<MyCources> {
                                       MaterialPageRoute(
                                         builder: (context) => BatchesShowByCourseScreen(
                                             id: courceController.courseDetailsDataModel.data?.course?.id ?? 0,
-                                            count: courceController.batchmodel.data!.batches!.length ?? 0),
+                                            count: courceController.batchmodel.data!.batches!.length),
                                       ),
                                     );
                                   } else {

@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:edxera/category/category_view.dart';
-import 'package:edxera/home/home_main.dart';
 import 'package:edxera/login/Models/login_data_model.dart';
-import 'package:edxera/login/OtpVerification/otp_verification_screen.dart';
 import 'package:edxera/repositories/post_repository.dart';
 import 'package:edxera/utils/shared_pref.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -15,15 +14,23 @@ class LoginControllers extends GetxController {
   TextEditingController passwordController = TextEditingController();
 
   void loginApi() async {
+    print("login function");
     var deviceids = DateTime.now();
 
     isloader(true);
-    var data = {'email': emailController.text, 'password': passwordController.text, 'device_token': deviceids.toString()};
+    var data = {
+      'email': emailController.text,
+      'password': passwordController.text,
+      'device_token': deviceids.toString()
+    };
     try {
+      print("login function 1");
       LoginDataModel? classesData = await postRepository.sendLoginData(data);
+      print("login function 2");
       if ((classesData?.success ?? false)) {
         //Get.offAll(const HomeMainScreen());
         // Get.to(Verification(emailid: emailController.value.text));
+        print("login FFF ${classesData}");
         PrefData.setdeviceToken(deviceids.toString());
         //TODO:- OtpVerification removed
         // Get.offAll(const OtpVerification());
@@ -32,39 +39,17 @@ class LoginControllers extends GetxController {
         PrefData.setUserPhone(classesData?.data?.phone ?? "0");
         // Get.offAll(const HomeMainScreen());
         Get.offAll(const CategoryGridView());
-
-        Get.showSnackbar(
-          GetSnackBar(
-            backgroundColor: Colors.green,
-            message: classesData?.message,
-            duration: const Duration(seconds: 1),
-          ),
-        );
+        Fluttertoast.showToast(msg: classesData?.message ?? "Login successful");
       } else {
-        Get.showSnackbar(
-          GetSnackBar(
-            backgroundColor: Colors.red,
-            message: classesData?.message,
-            duration: const Duration(seconds: 1),
-          ),
-        );
+        Fluttertoast.showToast(msg: classesData?.message ?? "Login failed");
       }
     } on DioException catch (ex) {
-      Get.showSnackbar(
-        GetSnackBar(
-          backgroundColor: Colors.red,
-          message: ex.message ??
-              (ex.response?.data != null
-                  ? (ex.response?.data as Map<String, dynamic>).containsKey('message')
-                      ? ex.response?.data['message']
-                      : ex.response?.statusMessage ?? "Login failed"
-                  : "Login failed"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      Fluttertoast.showToast(msg: ex.message ?? "Login failed");
+    } catch (ex) {
+      // Catch non-Dio errors (e.g. TypeError) so loader can't spin forever
+      Fluttertoast.showToast(msg: "Login failed");
+    } finally {
       isloader(false);
-      if (ex.type == DioExceptionType.unknown) {}
     }
-    isloader(false);
   }
 }

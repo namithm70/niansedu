@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:211414476514:android:cf19874f768c40cb2920bb",
         "android_client_info": {
-          "package_name": "com.edxera.app"
+          "package_name": "com.nians.educampus.app"
         }
       },
       "oauth_client": [],
@@ -28,7 +28,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:211414476514:android:4596ebb663c74d552920bb",
         "android_client_info": {
-          "package_name": "com.edxera.learning.app"
+          "package_name": "com.nians.educampus.app"
         }
       },
       "oauth_client": [],

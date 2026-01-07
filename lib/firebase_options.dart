@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '211414476514',
     projectId: 'edxera-ccb25',
     storageBucket: 'edxera-ccb25.firebasestorage.app',
-    iosBundleId: 'com.edxera.app',
+    iosBundleId: 'com.nians.educampus.app',
   );
 
 }

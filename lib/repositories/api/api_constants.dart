@@ -1,7 +1,37 @@
 class ApiConstants {
   static String login = 'login';
   static String user_exists = 'user/user_exists';
-  static String publicBaseUrl = 'https://xianinfotech.in/edxera/public';
+  static String publicBaseUrl = 'https://edxera.com/';
+  static String apiBaseUrl = 'https://edxera.com/api/';
+  static String organizationIdHeader = 'organization-id';
+  static String organizationId = '11';
+  static String apiKeyHeader = 'api-key';
+  static String apiKey = '11';
+
+  /// Convert a possibly-relative media path into a full URL.
+  /// - If [path] is already absolute (`http...`), returns it as-is.
+  /// - If [path] starts with `public/`, returns `<publicBaseUrl>/public/...`.
+  /// - Otherwise returns `<publicBaseUrl>/public/<path>`.
+  static String resolvePublicUrl(String? path) {
+    if (path == null) return '';
+    final trimmed = path.trim();
+    if (trimmed.isEmpty) return '';
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+
+    // Normalize base URL (avoid double slashes).
+    final base = publicBaseUrl.endsWith('/')
+        ? publicBaseUrl.substring(0, publicBaseUrl.length - 1)
+        : publicBaseUrl;
+
+    // Remove leading slashes so we don't end up with `//`.
+    final cleaned = trimmed.replaceFirst(RegExp(r'^/+'), '');
+    if (cleaned.startsWith('public/')) {
+      return '$base/$cleaned';
+    }
+    return '$base/public/$cleaned';
+  }
   static String register = 'register_ac';
   static String get_verification_otp = 'get-verification-otp';
   static String reset_password = 'reset-password';
@@ -24,10 +54,12 @@ class ApiConstants {
   static String get_live_classes = 'get_live_classes';
   static String join_batch = 'join_batch';
   static String study_plan_exam_mcq_inner = 'study_plan_exam_mcq_inner';
-  static String study_plan_exam_description_inner = 'study_plan_exam_description_inner';
+  static String study_plan_exam_description_inner =
+      'study_plan_exam_description_inner';
   static String get_all_assignment_list_user = 'get_all_assignment_list_user';
   static String get_all_test_list_user = 'get_all_test_list_user';
-  static String get_videos_and_study_materials = 'get_videos_and_study_materials';
+  static String get_videos_and_study_materials =
+      'get_videos_and_study_materials';
   static String submit_answer_mcq = 'submit_answer_mcq';
   static String study_plan_assignment_inner = 'study_plan_assignment_inner';
   static String submit_answer_description = 'submit_answer_description';
@@ -66,17 +98,15 @@ class ApiConstants {
   static String studentpaymentdetails = 'studentpaymentdetails';
   static String logout_api = 'logout_api';
 
-
-  static String get_all_categories = '/get_all_categories';
-  static String add_categories_for_user = '/add_categories_for_user';
-  static String get_job_list = '/get_job_list';
-  static String delete_job = '/delete_job';
-  static String add_job = '/add_job';
-  static String get_course_reels = '/get_course_reels';
-  static String get_course_reels_details = '/get_course_reels_details';
-  static String like_or_unlike_course = '/like_or_unlike_course';
-  static String comment_course = '/comment_course';
-  static String view_course_likes = '/view_course_likes';
-  static String view_course_comments = '/view_course_comments';
-
+  static String get_all_categories = 'get_all_categories';
+  static String add_categories_for_user = 'add_categories_for_user';
+  static String get_job_list = 'get_job_list';
+  static String delete_job = 'delete_job';
+  static String add_job = 'add_job';
+  static String get_course_reels = 'get_course_reels';
+  static String get_course_reels_details = 'get_course_reels_details';
+  static String like_or_unlike_course = 'like_or_unlike_course';
+  static String comment_course = 'comment_course';
+  static String view_course_likes = 'view_course_likes';
+  static String view_course_comments = 'view_course_comments';
 }

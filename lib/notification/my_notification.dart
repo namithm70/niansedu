@@ -5,6 +5,7 @@ import 'package:edxera/utils/shared_pref.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+@pragma('vm:entry-point')
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print("onBackground: ${message.notification?.title}/${message.notification?.body}/${message.notification?.titleLocKey}");
 }
@@ -69,7 +70,7 @@ class MyNotification {
       PrefData.setdfcmToken(fcmToken.toString());
       initPushNotification();
       initLocalNotification();
-    } on Exception catch (e) {
+    } on Exception {
       // TODO
     }
   }

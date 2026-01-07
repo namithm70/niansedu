@@ -74,23 +74,34 @@ class _FreeStudyMatrialViewScreenState extends State<FreeStudyMatrialViewScreen>
                             return ListView.builder(
                               itemCount: freeStudyMatrialController.freeStudyMatrialListDataModel.data?.freeStudyMaterials?.length,
                               shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => PdfViwersScreen(
-                                                name:
-                                                    freeStudyMatrialController.freeStudyMatrialListDataModel.data?.freeStudyMaterials?[index].notes ??
-                                                        '',
-                                                path:
-                                                    '${ApiConstants.publicBaseUrl}/${freeStudyMatrialController.freeStudyMatrialListDataModel.data?.freeStudyMaterials?[index].pdf ?? ''}')));
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(left: 15.w, right: 15.w, bottom: 7.5.w, top: 7.5.w),
-                                    width: double.infinity.w,
-                                    decoration: BoxDecoration(
+                          itemBuilder: (context, index) {
+                            final material =
+                                freeStudyMatrialController.freeStudyMatrialListDataModel.data?.freeStudyMaterials?[index];
+                            final title = (material?.title ?? '').trim();
+                            final notes = (material?.notes ?? '').trim();
+                            final displayText = title.isNotEmpty ? title : notes;
+                            return InkWell(
+                              onTap: () {
+                                final pdfPath = (material?.pdf ?? '').trim();
+                                if (pdfPath.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('No details available for this material.'),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PdfViwersScreen(
+                                            name: displayText.isNotEmpty ? displayText : 'Study Material',
+                                            path: '${ApiConstants.publicBaseUrl}/$pdfPath')));
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(left: 15.w, right: 15.w, bottom: 7.5.w, top: 7.5.w),
+                                width: double.infinity.w,
+                                decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10.h),
                                         boxShadow: [
                                           BoxShadow(color: const Color(0XFF503494).withOpacity(0.14), offset: const Offset(-4, 5), blurRadius: 16.h),
@@ -109,11 +120,14 @@ class _FreeStudyMatrialViewScreenState extends State<FreeStudyMatrialViewScreen>
                                           SizedBox(
                                             width: 10.w,
                                           ),
-                                          Text(
-                                            (freeStudyMatrialController.freeStudyMatrialListDataModel.data?.freeStudyMaterials?[index].title ?? '')
-                                                .toUpperCase(),
-                                            style: TextStyle(
-                                                color: Color(0XFF503494), fontSize: 15.sp, fontFamily: 'Gilroy', fontWeight: FontWeight.bold),
+                                          Expanded(
+                                            child: Text(
+                                              (displayText.isNotEmpty ? displayText : 'Untitled Material').toUpperCase(),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: Color(0XFF503494), fontSize: 15.sp, fontFamily: 'Gilroy', fontWeight: FontWeight.bold),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -245,7 +259,7 @@ class _FreeStudyMatrialViewScreenState extends State<FreeStudyMatrialViewScreen>
   Widget search_text_field() {
     return Padding(
       padding: EdgeInsets.only(left: 20.w, right: 20.w),
-      child: Container(
+        child: Container(
         height: 50,
         child: TextFormField(
             controller: freeStudyMatrialController.searchcontroller,

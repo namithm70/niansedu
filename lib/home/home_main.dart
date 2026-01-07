@@ -1,15 +1,12 @@
 import 'package:edxera/batchs/batches_main_screen.dart';
-import 'package:edxera/homes/homes.dart';
 import 'package:edxera/jobs/job_list_view.dart';
 import 'package:edxera/reels/controller/reel_controller.dart';
-import 'package:edxera/reels/reels_home.dart';
 import 'package:edxera/store/webview_store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edxera/controller/controller.dart';
 import 'package:edxera/home/home_screen.dart';
-import '../My_cources/ongoing_completed_main_screen.dart';
-import '../chate/chate_screen.dart';
+import 'package:edxera/home/trending_cource.dart';
 import '../profile/my_profile.dart';
 import '../utils/slider_page_data_model.dart';
 
@@ -205,22 +202,17 @@ class _HomeMainScreenState extends State<HomeMainScreen> {
   _body() {
     switch (controller.position.value) {
       case 0:
-        //return Center(child: Container(child: Text("1")));
-        return ReelsHome();
-      case 1:
         return HomeScreen();
+      case 1:
+        // Courses tab
+        return const TrendingCource();
       case 2:
-        //return Center(child: Container(child: Text("1")));
         return BatchesScreen();
       case 3:
-        //return Center(child: Container(child: Text("2")));
         return JobListScreen();
       case 4:
-        //return Center(child: Container(child: Text("3")));
         return const WebviewStore();
       case 5:
-        return MyProfile();
-      case 6:
         return MyProfile();
 
       default:

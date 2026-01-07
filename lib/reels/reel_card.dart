@@ -7,7 +7,6 @@ import 'package:edxera/repositories/api/api_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -73,7 +72,7 @@ class _ReelCardState extends State<ReelCard> {
       reelController.reels[widget.index] =
           reelController.reels[widget.index].copyWith(courseLikeCount: newLike);
     }
-    final result = await reelController.likeDislike(courseId: id);
+    await reelController.likeDislike(courseId: id);
     // setState(() {
     //   if (result) {
     //     isLiked = true;
@@ -94,8 +93,7 @@ class _ReelCardState extends State<ReelCard> {
     setState(() {
       isCommentLoading = true;
     });
-    final result = await reelController.addComment(
-        courseId: id, comment: commentController.text);
+    await reelController.addComment(courseId: id, comment: commentController.text);
 
     // if (result) {
     //   int newCount = (reelController.reels[widget.index].courseCommentCount ?? 0) + 1;
@@ -121,10 +119,9 @@ class _ReelCardState extends State<ReelCard> {
       setState(() {
         isLoading = true;
       });
-      final post = (reelController.reels[widget.index].courseReelVideo ?? "")
-              .isEmpty
-          ? ("${ApiConstants.publicBaseUrl}/${(reelController.reels[widget.index].courseThumbnail ?? "")}")
-          : ("${ApiConstants.publicBaseUrl}/${(reelController.reels[widget.index].courseReelVideo ?? "")}");
+      final post = (reelController.reels[widget.index].courseReelVideo ?? "").isEmpty
+          ? ApiConstants.resolvePublicUrl(reelController.reels[widget.index].courseThumbnail)
+          : ApiConstants.resolvePublicUrl(reelController.reels[widget.index].courseReelVideo);
       _controller = VideoPlayerController.networkUrl(Uri.parse(post));
       await _controller.initialize();
 
@@ -133,7 +130,7 @@ class _ReelCardState extends State<ReelCard> {
       // }
 
       _createChewieController();
-    } on PlatformException catch (err) {
+    } on PlatformException {
       setState(() {
         isError = true;
       });
@@ -164,7 +161,7 @@ class _ReelCardState extends State<ReelCard> {
       setState(() {
         isLoading = false;
       });
-    } catch (e) {
+    } catch (_) {
       setState(() {
         isLoading = false;
       });
@@ -354,37 +351,50 @@ class _ReelCardState extends State<ReelCard> {
             ],
           ),
           SizedBox(height: 20),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: isLiked ? Colors.red : null),
-                onPressed: () => _toggleLike(item.id!),
-              ),
-              GestureDetector(
-                onTap: () => _showLikeBottomSheet(item.id!),
-                child: Text("${item.courseLikeCount ?? 0}"),
-              ),
-              SizedBox(width: 10),
-              IconButton(
-                icon: Icon(Icons.comment),
-                onPressed: _showComment,
-              ),
-              GestureDetector(
-                onTap: () => _showCommentsBottomSheet(item.id!),
-                child: Text("${item.courseCommentCount ?? 0}"),
-              ),
-              Spacer(),
-              IconButton(
-                icon: Icon(Icons.share),
-                onPressed: () {
-                  final post = (item.courseReelVideo ?? "").isEmpty
-                      ? ("${ApiConstants.publicBaseUrl}/${(item.courseThumbnail ?? "")}")
-                      : ("${ApiConstants.publicBaseUrl}/${(item.courseReelVideo ?? "")}");
-                  Share.shareUri(Uri.parse(post));
-                },
-              ),
-            ],
+          // Avoid "RenderFlex overflowed" on small screens by allowing horizontal scroll
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(),
+                  icon: Icon(
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: isLiked ? Colors.red : null,
+                  ),
+                  onPressed: () => _toggleLike(item.id!),
+                ),
+                GestureDetector(
+                  onTap: () => _showLikeBottomSheet(item.id!),
+                  child: Text("${item.courseLikeCount ?? 0}"),
+                ),
+                const SizedBox(width: 10),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.comment),
+                  onPressed: _showComment,
+                ),
+                GestureDetector(
+                  onTap: () => _showCommentsBottomSheet(item.id!),
+                  child: Text("${item.courseCommentCount ?? 0}"),
+                ),
+                const SizedBox(width: 16),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.share),
+                  onPressed: () {
+                    final post = (item.courseReelVideo ?? "").isEmpty
+                        ? ApiConstants.resolvePublicUrl(item.courseThumbnail)
+                        : ApiConstants.resolvePublicUrl(item.courseReelVideo);
+                    Share.shareUri(Uri.parse(post));
+                  },
+                ),
+              ],
+            ),
           ),
           if (isShowComment)
             Padding(

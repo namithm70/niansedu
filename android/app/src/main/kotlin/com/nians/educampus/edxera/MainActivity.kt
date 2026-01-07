@@ -1,4 +1,4 @@
-package com.edxera.learning.app
+package com.nians.educampus.edxera
 
 import io.flutter.embedding.android.FlutterActivity
 

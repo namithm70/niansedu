@@ -57,13 +57,15 @@ class _SplashscreenState extends State<Splashscreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Center(
-              child: Container(
-                  // height: 95.h,
-                  width: 0.5.sw,
-                  child: Image(
-                    image: const AssetImage("assets/app_logo.jpeg"),
-                    fit: BoxFit.cover,
-                  ))),
+            child: SizedBox(
+              width: 0.7.sw,
+              height: 0.7.sw,
+              child: Image(
+                image: const AssetImage("assets/app_logo_trimmed.png"),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
           SizedBox(
             height: 10,
           ),

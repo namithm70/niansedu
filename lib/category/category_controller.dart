@@ -1,6 +1,7 @@
 import 'package:edxera/category/categor_model.dart';
 import 'package:edxera/category/category_service.dart';
 import 'package:edxera/home/home_main.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class CategoryController extends GetxController {
@@ -58,23 +59,23 @@ class CategoryController extends GetxController {
     try {
       final categoryIds = getSelectedCategoryIds();//1,1,1,
       if (categoryIds.isEmpty) {
-        Get.snackbar('Error', 'No categories selected!');
+        Fluttertoast.showToast(msg: 'No categories selected!');
         return;
       }
 
       final response =
           await _categoryService.submitCategories( categoryIds);
       if (response != null && response.statusCode == 200) {
-        Get.snackbar('Success', 'Categories added successfully!');
+        Fluttertoast.showToast(msg: 'Categories added successfully!');
         Get.offAll(()=>const HomeMainScreen());
 
 
       } else {
-        Get.snackbar('Error', 'Failed to add categories.');
+        Fluttertoast.showToast(msg: 'Failed to add categories.');
       }
     } catch (e) {
       errorMessage.value = "Error occurred while submitting categories: $e";
-      Get.snackbar('Error', 'Failed to submit categories.');
+      Fluttertoast.showToast(msg: 'Failed to submit categories.');
     } finally {
       isSubmitting.value = false;
     }
