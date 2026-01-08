@@ -66,13 +66,18 @@ class _MyCertificationState extends State<MyCertification> {
       }
       try {
         FileUtils.mkdir([dirloc]);
-        await dio.download(path, dirloc + convertCurrentDateTimeToString() + ".pdf", onReceiveProgress: (receivedBytes, totalBytes) {
+        await dio.download(
+          path,
+          dirloc + convertCurrentDateTimeToString() + ".pdf",
+          options: Options(headers: ApiConstants.authHeaders()),
+          onReceiveProgress: (receivedBytes, totalBytes) {
           print(dirloc + convertCurrentDateTimeToString() + ".pdf");
           print('here 1');
           myCertificationScreenConyroller.isloader(false);
           // Get.snackbar("", 'Download Complete');
           print('here 2');
-        });
+        },
+        );
       } catch (e) {
         print('catch catch catch');
         print(e);
@@ -92,13 +97,18 @@ class _MyCertificationState extends State<MyCertification> {
       }
       try {
         FileUtils.mkdir([dirloc]);
-        await dio.download(path, dirloc + convertCurrentDateTimeToString() + ".pdf", onReceiveProgress: (receivedBytes, totalBytes) {
+        await dio.download(
+          path,
+          dirloc + convertCurrentDateTimeToString() + ".pdf",
+          options: Options(headers: ApiConstants.authHeaders()),
+          onReceiveProgress: (receivedBytes, totalBytes) {
           print(dirloc + convertCurrentDateTimeToString() + ".pdf");
           print('here 1');
           myCertificationScreenConyroller.isloader(false);
           // Get.snackbar("", 'Download Complete');
           print('here 2');
-        });
+        },
+        );
       } catch (e) {
         print('catch catch catch');
         print(e);
@@ -167,6 +177,7 @@ class _MyCertificationState extends State<MyCertification> {
 
                                           child: PDF().cachedFromUrl(
                                         "${ApiConstants.publicBaseUrl}/${myCertificationScreenConyroller.getCourseCertificateDataModel.data?.courseCertificate?[index].certificateFile ?? ''}",
+                                        headers: ApiConstants.authHeaders(),
                                         errorWidget: (error) => Center(child: Text(error.toString())),
                                       ));
                                     },

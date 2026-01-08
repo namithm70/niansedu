@@ -4,9 +4,15 @@ class ApiConstants {
   static String publicBaseUrl = 'https://edxera.com/';
   static String apiBaseUrl = 'https://edxera.com/api/';
   static String organizationIdHeader = 'organization-id';
-  static String organizationId = '11';
-  static String apiKeyHeader = 'api-key';
-  static String apiKey = '11';
+  static String organizationId = '10';
+  static String apiKeyHeader = 'apiKey';
+  static String apiKey = 'vBLJ6ROctl9BBuIOEaFSBQjm8nVLIbz21VR4vmPKkBwHduFeUI';
+  static Map<String, String> authHeaders() {
+    return {
+      organizationIdHeader: organizationId,
+      apiKeyHeader: apiKey,
+    };
+  }
 
   /// Convert a possibly-relative media path into a full URL.
   /// - If [path] is already absolute (`http...`), returns it as-is.

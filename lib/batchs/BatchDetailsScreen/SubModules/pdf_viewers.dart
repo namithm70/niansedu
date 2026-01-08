@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import '../../../repositories/api/api_constants.dart';
 
 class PdfViwersScreen extends StatefulWidget {
   String name, path;
@@ -52,6 +53,7 @@ class _PdfViwersScreenState extends State<PdfViwersScreen> {
       Response response = await dio.get(
         widget.path,
         options: Options(
+            headers: ApiConstants.authHeaders(),
             responseType: ResponseType.bytes,
             followRedirects: false,
             validateStatus: (status) {

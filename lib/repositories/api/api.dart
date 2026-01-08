@@ -16,9 +16,7 @@ class API {
   API() {
     // Production API base URL
     _dio.options.baseUrl = ApiConstants.apiBaseUrl;
-    _dio.options.headers[ApiConstants.organizationIdHeader] =
-        ApiConstants.organizationId;
-    _dio.options.headers[ApiConstants.apiKeyHeader] = ApiConstants.apiKey;
+    _dio.options.headers.addAll(ApiConstants.authHeaders());
     // Prevent infinite loaders on bad networks/server hangs
     _dio.options.connectTimeout = const Duration(seconds: 15);
     _dio.options.receiveTimeout = const Duration(seconds: 20);

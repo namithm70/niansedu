@@ -124,7 +124,10 @@ class PostRepository {
         ApiConstants.login,
         data: data,
             options: Options(
-              headers: const {'Accept': 'application/json'},
+              headers: {
+                ...ApiConstants.authHeaders(),
+                'Accept': 'application/json',
+              },
               contentType: Headers.jsonContentType,
             ),
           )

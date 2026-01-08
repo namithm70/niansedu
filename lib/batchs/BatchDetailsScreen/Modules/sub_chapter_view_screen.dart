@@ -143,7 +143,10 @@ class _SubChapterViewScreenState extends State<SubChapterViewScreen> {
                               );
 
                               /// Download file
-                              final response = await http.get(uri);
+                              final response = await http.get(
+                                uri,
+                                headers: ApiConstants.authHeaders(),
+                              );
                               if (response.statusCode == 200) {
                                 // Get the appropriate directory
                                 Directory? directory;

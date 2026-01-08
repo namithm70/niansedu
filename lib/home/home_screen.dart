@@ -125,6 +125,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 16.h),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Image.asset(
+                              'assets/app_logo_trimmed.png',
+                              height: 28.h,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
                         // InkWell(
                         //   onTap: () {
                         //     Navigator.push(context, MaterialPageRoute(builder: (context) => EditScreen()));
